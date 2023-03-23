@@ -1,5 +1,5 @@
 # Roomba
-Python script to simulate runs in the teleporting roomba problem, below:
+Quick casual python script to simulate runs in the teleporting roomba problem, below:
 
 You own a roomba—let’s name him James—and want him to clean the entirety of your apartment, which is one 5’x6’ room (you live in NYC). You put James in the Northwest corner of your apartment, and position him facing South. When James is pointing in one direction, he will keep moving in that direction, vacuuming 1 square foot at a time, until he hits a wall. He vacuums squares at a pace of 1 square foot per second. 
 
