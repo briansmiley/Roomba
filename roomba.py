@@ -1,9 +1,9 @@
 from random import randint
 from time import sleep
-from collections import Counter
+import os
 
 #Set draw to True to print the grid while iterating; drawSpeed is the sleep time in seconds between frames
-draw = True
+draw = False
 drawSpeed = .1
 
 rows, columns = 5,6
@@ -62,7 +62,7 @@ def cycle():
     direction = [1,0]
     return seconds
 
-#Log {runs} number of simulations
+#Log {runs} number of simulations, optionally logging each run length to trials.txt and returning the list of run lengths
 def run(runs, log = False, returnRes = True):
     for i in range(runs):
         a = cycle()
@@ -70,16 +70,16 @@ def run(runs, log = False, returnRes = True):
         if draw: print(a)
         if (i+1) % (runs/10) == 0: print(f'Runs completed: {i+1} of {runs}')
 
-    #Change path name to save results!
+    #Logs results in trials.txt as comma separated list of run lengths
     if log:
-        with open("/Users/briansmiley/Projects/RoombaProblem/trials.txt","a") as output:
+        with open(f'{os.getcwd()}/trials.txt',"a+") as output:
             output.write(",".join([str(i) for i in results]))
             output.write("\n")
     if returnRes: return results
 
-#Put in appropriate file path to read the current average result (or do whatever else with the data)
+#Reads from trials.txt to get the average run length
 def average():
-    with open("/Users/briansmiley/Projects/RoombaProblem/trials.txt","r") as runs:
+    with open(f"{os.getcwd()}/trials.txt","r") as runs:
         runs = runs.readlines()
         runs = [[int(i) for i in run.split(",")] for run in runs]
         a = []
@@ -88,5 +88,5 @@ def average():
 
 # run(1, log = False)
 # average()
-a=run(1)
+a=run(1000, log=True)
 print(f'Runs: {len(a):_}, Average: {sum(a)/len(a):.6f}')
