@@ -1,5 +1,5 @@
 # Roomba
-Quick casual python script to simulate runs in the teleporting roomba problem, below:
+Quick casual python script to simulate runs in the teleporting roomba problem, below. Can display simulation runs using the Curses terminal display module:
 
 ## Command line arguments:
 
