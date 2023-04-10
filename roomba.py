@@ -2,18 +2,28 @@ from random import randint
 from time import sleep
 import os
 import curses
+import argparse
+
+#parse a few command line arguments
+parser = argparse.ArgumentParser(description="Run simulations of a standard Teleporting Roomba probelm", formatter_class=argparse.MetavarTypeHelpFormatter)
+parser.add_argument('--draw', '-d', dest = 'draw', action = "store_true", help = "display roomba movement during simulation")
+parser.add_argument('--speed', '-s', dest = 'drawSpeed', type = float, default = 75, help = "drawing refresh rate in ms (default 75ms)")
+parser.add_argument('--log', '-l', dest = 'log', action = "store_true", help = "save the simulation runs to trials.txt")
+parser.add_argument('--runs', '-r', dest = 'runs', type = int, default = 1, help = "number of simulation runs")
+parser.add_argument('--dimensions', '-dim', dest = 'dimensions', nargs = 2, type = int, default = [5,6], help = 'floor dimensions (y x)')
+args = parser.parse_args()
 
 #Set draw to True to print the grid while iterating; drawSpeed is the sleep time in seconds between frames
-draw = False
-drawSpeed = .1
+draw = args.draw
+drawSpeed = args.drawSpeed
 
 #Set runs to the number of runs you want to do, typically one for display, more if you want to log data
-runs = 10000
+runs = args.runs
 
 #set log to True to save run data to trials.txt
-log = False
+log = args.log
 
-rows, columns = 5,6
+rows, columns = tuple(args.dimensions)
 dirty = [[i,j] for i in range(rows) for j in range(columns)]
 position = [0,0]
 direction = [1,0]
@@ -57,7 +67,7 @@ def clean(position, direction):
         if(draw):
             drawFloor(dirty,position,direction)
             stdscr.refresh()
-            sleep(drawSpeed)
+            sleep(drawSpeed/1000)
         position = [sum(x) for x in zip(position, direction)]
     return time
 
@@ -103,12 +113,23 @@ def average():
         for run in runs: a.extend(run)
         print(f'Runs: {len(a):_}, Average: {sum(a)/len(a):.6f}')
 
-# run(1, log = False)
-# average()
-a=run(runs, log=log)
-message = f'Runs: {len(a):_}, Average: {sum(a)/len(a):.6f}'
-if draw:
-    stdscr.addstr(rows,0,message)
-    stdscr.getch()
-else:
-    print(message)
+def main(scr):
+    # run(1, log = False)
+    # average()
+    global stdscr
+    stdscr = scr
+    a=run(runs, log=log)
+    message = f'Runs: {len(a):_}, Average: {sum(a)/len(a):.6f}'
+    if draw:
+        stdscr.addstr(rows,0,message + "\n\nPress any key to exit")
+        stdscr.getch()
+    else:
+        print(message)
+
+if __name__ == '__main__':
+    try:
+        curses.wrapper(main)
+    finally:
+        curses.echo()
+        curses.nocbreak()
+        curses.endwin()
