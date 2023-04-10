@@ -1,10 +1,17 @@
 from random import randint
 from time import sleep
 import os
+import curses
 
 #Set draw to True to print the grid while iterating; drawSpeed is the sleep time in seconds between frames
 draw = False
 drawSpeed = .1
+
+#Set runs to the number of runs you want to do, typically one for display, more if you want to log data
+runs = 10000
+
+#set log to True to save run data to trials.txt
+log = False
 
 rows, columns = 5,6
 dirty = [[i,j] for i in range(rows) for j in range(columns)]
@@ -12,26 +19,35 @@ position = [0,0]
 direction = [1,0]
 seconds = 0
 
-def reset():
-    dirty = [[i,j] for i in range(rows) for j in range(columns)]
-    position = (0,0)
-    direction = [1,0]
-    seconds = 0
+# Initialize curses if we're drawing
+if draw:
+    stdscr = curses.initscr()
+    curses.noecho()
+    curses.cbreak()
+    curses.curs_set(0)
+    stdscr.keypad(True)
+
+
 def teleport():
     position = dirty[randint(0,len(dirty)-1)]
     direction = [[0,1],[0,-1],[1,0],[-1,0]][randint(0,3)]
     return(position, direction)
 def drawFloor(dirtGrid,roomba,direction):
-    floor = [[" · " for i in range(columns)] for j in range(rows)]
+    global stdscr
+    floor = [["·" for i in range(columns)] for j in range(rows)]
     dir = tuple(direction)
     avatar = {(0,1): ">", (0,-1): "<", (1,0): "V", (-1,0): "Λ"}
     for spot in dirtGrid:
-        floor[spot[0]][spot[1]] = " # "
-    floor[roomba[0]][roomba[1]] = f" {avatar[dir]} "
-    print("\n".join(["".join(floor[i]) for i in range(len(floor))]),"\n")
+        floor[spot[0]][spot[1]] = "#"
+    floor[roomba[0]][roomba[1]] = f"{avatar[dir]}"
+    for i in range(len(floor)):
+        for j in range(len(floor[0])):
+            stdscr.addch(i,j,floor[i][j])
+    #print("\n".join(["".join(floor[i]) for i in range(len(floor))]),"\n")
 
 def clean(position, direction):
     time = 0
+    global stdscr
     while position[0] > -1 and position[0] < rows and position[1] > -1 and position[1] < columns:
         time += 1
         if len(dirty) == 0:
@@ -40,6 +56,7 @@ def clean(position, direction):
             dirty.remove(position)
         if(draw):
             drawFloor(dirty,position,direction)
+            stdscr.refresh()
             sleep(drawSpeed)
         position = [sum(x) for x in zip(position, direction)]
     return time
@@ -67,8 +84,8 @@ def run(runs, log = False, returnRes = True):
     for i in range(runs):
         a = cycle()
         results.append(a)
-        if draw: print(a)
-        if (i+1) % (runs/10) == 0: print(f'Runs completed: {i+1} of {runs}')
+        #if draw: print(a)
+        if (i+1) % (runs/10) == 0 and runs > 1000: print(f'Runs completed: {i+1} of {runs}')
 
     #Logs results in trials.txt as comma separated list of run lengths
     if log:
@@ -88,5 +105,10 @@ def average():
 
 # run(1, log = False)
 # average()
-a=run(1000, log=True)
-print(f'Runs: {len(a):_}, Average: {sum(a)/len(a):.6f}')
+a=run(runs, log=log)
+message = f'Runs: {len(a):_}, Average: {sum(a)/len(a):.6f}'
+if draw:
+    stdscr.addstr(rows,0,message)
+    stdscr.getch()
+else:
+    print(message)
