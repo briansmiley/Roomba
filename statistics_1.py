@@ -17,7 +17,7 @@ bins = range(min(data),max(data))
 plt.hist(x, bins = bins , density = True, log = True)
 plt.gca().set(title='Roomba Results', ylabel='Frequency', xlabel = 'Steps')
 plt.yscale('log')
-# plt.show()
+plt.show()
 
 mean = np.mean(data)
 std_dev = np.std(data)

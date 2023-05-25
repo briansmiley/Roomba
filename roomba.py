@@ -101,6 +101,7 @@ def run(runs, log = False, returnRes = True):
     if log:
         with open(f'{os.getcwd()}/trials.txt',"a+") as output:
             output.write(",".join([str(i) for i in results]))
+            output.write(',')
     if returnRes: return results
 
 #Reads from trials.txt to get the average run length
