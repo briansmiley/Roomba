@@ -95,7 +95,7 @@ def run(runs, log = False, returnRes = True):
         a = cycle()
         results.append(a)
         #if draw: print(a)
-        if (i+1) % (runs/10) == 0 and runs > 1000: print(f'Runs completed: {i+1} of {runs}')
+        #if (i+1) % (runs/10) == 0 and runs > 1000: print(f'Runs completed: {i+1} of {runs}')
 
     #Logs results in trials.txt as comma separated list of run lengths
     if log:
